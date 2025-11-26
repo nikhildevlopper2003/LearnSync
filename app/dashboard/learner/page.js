@@ -1,26 +1,20 @@
-// app/page.js
+// app/dashboard/learner/page.js
 "use client";
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { LearnerDashboard } from '@/components/dashboards/LearnerDashboard';
 
-export default function Home() {
+export default function LearnerDashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading) {
-      if (user) {
-        // Redirect based on role
-        if (user.role === 'helper') {
-          router.push('/dashboard/helper');
-        } else {
-          router.push('/dashboard/learner');
-        }
-      } else {
-        router.push('/login');
-      }
+    if (!loading && !user) {
+      router.push('/login');
+    } else if (!loading && user && user.role !== 'learner') {
+      router.push('/dashboard/helper');
     }
   }, [user, loading, router]);
 
@@ -35,5 +29,9 @@ export default function Home() {
     );
   }
 
-  return null;
+  if (!user) {
+    return null;
+  }
+
+  return <LearnerDashboard user={user} />;
 }
